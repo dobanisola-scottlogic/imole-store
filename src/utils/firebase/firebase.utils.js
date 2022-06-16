@@ -3,7 +3,8 @@ import {
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
-  signInWithRedirect,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword
 } from "firebase/auth";
 import { getDoc, doc, setDoc, getFirestore } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -33,7 +34,7 @@ export const signInWithGooglePopup = () =>
 
 const db = getFirestore();
 
-export const createUserDocFromAuth = async (userAuth) => {
+export const createUserDocumentFromAuth = async (userAuth, additionalInformation = {}) => {
   const userDocRef = doc(db, "users", userAuth.uid);
   const userSnapshot = await getDoc(userDocRef);
 
@@ -45,6 +46,7 @@ export const createUserDocFromAuth = async (userAuth) => {
         email,
         displayName,
         createdAt,
+        ...additionalInformation
       });
     } catch (error) {
       console.log("error creating user ", error.message);
@@ -53,3 +55,19 @@ export const createUserDocFromAuth = async (userAuth) => {
 
   return userDocRef;
 };
+
+export const createAuthUserWithEmailAndPassword = async(email, password) => {
+    if(!email || !password){
+        return;
+    }
+
+    return await createUserWithEmailAndPassword(auth, email, password);
+}
+
+export const getAuthUserWithEmailAndPassword = async(email, password) => {
+    if(!email || !password){
+        return;
+    }
+
+    return await signInWithEmailAndPassword(auth, email, password);
+}
