@@ -1,38 +1,40 @@
-import { useContext } from "react";
-import { CartContext } from "../../contexts/cart.context";
-import "./checkout-item.styles.scss";
+import { useDispatch, useSelector } from 'react-redux';
 
-const CheckoutItem = ({ cartItem  }) => {
+import {
+  CheckoutItemContainer,
+  ImageContainer,
+  BaseSpan,
+  Quantity,
+  Arrow,
+  Value,
+  RemoveButton,
+} from "./checkout-item.styles";
+import { addItemToCart, removeItemToCart, clearItemFromCart } from '../../store/cart/cart.action';
+import { selectCartItems } from '../../store/cart/cart.selector';
+
+const CheckoutItem = ({ cartItem }) => {
   const { imageUrl, price, name, quantity } = cartItem;
-  const {
-    addItemToCart,
-    reduceItemFromCart,
-    removeProductFromCart,
-  } = useContext(CartContext);
+  
+  const cartItems  = useSelector(selectCartItems);
+  const dispatch = useDispatch();
+  const addItemHandler = () => dispatch(addItemToCart(cartItems, cartItem));
+  const removeItemHandler = () => dispatch(removeItemToCart(cartItems, cartItem));
+  const clearItemHandler = () => dispatch(clearItemFromCart(cartItems, cartItem));
 
-  const addItem = () => {
-    addItemToCart(cartItem);
-  }
-  const reduceItem = () => {
-    reduceItemFromCart(cartItem);
-  }
-  const removeItem = () => {
-    removeProductFromCart(cartItem);
-  }
   return (
-    <div className="checkout-item-container">
-    <div className="image-container">
-      <img src={imageUrl} alt={`${name}`} />
-      </div>
-      <span className="item-text name">{name}</span>
-      <span className="item-text quantity">
-        <div className="arrow" onClick={reduceItem}>&#10094;</div> 
-        <span className="value">{quantity}</span> 
-        <div className="arrow" onClick={addItem}>&#10095;</div>
-      </span>
-      <span className="item-text price">{price}</span>
-      <div className="remove-button" onClick={removeItem}>&#10005;</div>
-    </div>
+    <CheckoutItemContainer>
+      <ImageContainer>
+        <img src={imageUrl} alt={`${name}`} />
+      </ImageContainer>
+      <BaseSpan> {name} </BaseSpan>
+      <Quantity>
+        <Arrow onClick={removeItemHandler}>&#10094;</Arrow>
+        <Value>{quantity}</Value>
+        <Arrow onClick={addItemHandler}>&#10095;</Arrow>
+      </Quantity>
+      <BaseSpan> {price}</BaseSpan>
+      <RemoveButton onClick={clearItemHandler}>&#10005;</RemoveButton>
+    </CheckoutItemContainer>
   );
 };
 
